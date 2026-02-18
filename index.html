@@ -1,0 +1,1772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SOLVO — Engineer Your Career</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* ═══════════════════════════════════════════
+       TOKENS
+    ═══════════════════════════════════════════ */
+    :root {
+      --bg:          #080B0F;
+      --bg2:         #0D1117;
+      --bg3:         #131920;
+      --surface:     #151D26;
+      --border:      rgba(255,255,255,0.07);
+      --border2:     rgba(255,255,255,0.12);
+      --amber:       #F0A500;
+      --amber-glow:  rgba(240,165,0,0.15);
+      --amber-dim:   rgba(240,165,0,0.6);
+      --teal:        #00C9A7;
+      --teal-glow:   rgba(0,201,167,0.12);
+      --coral:       #FF6B6B;
+      --text:        #E8EDF2;
+      --text2:       #8A95A3;
+      --text3:       #4A5568;
+      --font-head:   'Syne', sans-serif;
+      --font-body:   'Plus Jakarta Sans', sans-serif;
+      --font-mono:   'JetBrains Mono', monospace;
+      --radius:      12px;
+      --radius-lg:   20px;
+    }
+
+    /* ═══════════════════════════════════════════
+       RESET & BASE
+    ═══════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.6;
+      overflow-x: hidden;
+      cursor: none;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+
+    /* ═══════════════════════════════════════════
+       CUSTOM CURSOR
+    ═══════════════════════════════════════════ */
+    .cursor {
+      position: fixed; top: 0; left: 0; z-index: 9999;
+      pointer-events: none;
+      mix-blend-mode: difference;
+    }
+    .cursor-dot {
+      width: 8px; height: 8px;
+      background: var(--amber);
+      border-radius: 50%;
+      position: absolute;
+      transform: translate(-50%, -50%);
+      transition: transform 0.1s;
+    }
+    .cursor-ring {
+      width: 36px; height: 36px;
+      border: 1.5px solid var(--amber-dim);
+      border-radius: 50%;
+      position: absolute;
+      transform: translate(-50%, -50%);
+      transition: all 0.15s ease;
+    }
+
+    /* ═══════════════════════════════════════════
+       SCROLLBAR
+    ═══════════════════════════════════════════ */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--amber); border-radius: 2px; }
+
+    /* ═══════════════════════════════════════════
+       UTILITY
+    ═══════════════════════════════════════════ */
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 28px; }
+    .tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: var(--font-mono); font-size: 11px; font-weight: 500;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--amber); background: var(--amber-glow);
+      border: 1px solid rgba(240,165,0,0.25);
+      padding: 5px 12px; border-radius: 4px;
+    }
+    .tag::before { content: '//'; opacity: 0.5; }
+    .section-label {
+      font-family: var(--font-mono); font-size: 11px;
+      text-transform: uppercase; letter-spacing: 0.15em;
+      color: var(--text3); margin-bottom: 14px;
+    }
+
+    /* ═══════════════════════════════════════════
+       NOISE OVERLAY
+    ═══════════════════════════════════════════ */
+    .noise {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      opacity: 0.025;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 128px 128px;
+    }
+
+    /* ═══════════════════════════════════════════
+       GRID BACKGROUND
+    ═══════════════════════════════════════════ */
+    .grid-bg {
+      position: absolute; inset: 0; pointer-events: none;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 80% 80% at 50% 0%, black 40%, transparent 100%);
+    }
+
+    /* ═══════════════════════════════════════════
+       NAV
+    ═══════════════════════════════════════════ */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 18px 0;
+      border-bottom: 1px solid transparent;
+      transition: all 0.3s;
+    }
+    nav.scrolled {
+      background: rgba(8,11,15,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom-color: var(--border);
+    }
+    .nav-inner {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .logo {
+      font-family: var(--font-head); font-size: 22px; font-weight: 800;
+      letter-spacing: -0.02em;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .logo-mark {
+      width: 28px; height: 28px; border-radius: 6px;
+      background: var(--amber);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .logo-mark svg { width: 14px; height: 14px; }
+    .logo span { color: var(--amber); }
+    .nav-links {
+      display: flex; align-items: center; gap: 32px;
+      list-style: none;
+      font-size: 14px; font-weight: 500;
+    }
+    .nav-links a {
+      color: var(--text2);
+      transition: color 0.2s;
+      position: relative;
+    }
+    .nav-links a::after {
+      content: ''; position: absolute; bottom: -3px; left: 0; right: 0;
+      height: 1px; background: var(--amber);
+      transform: scaleX(0); transform-origin: left;
+      transition: transform 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-links a:hover::after { transform: scaleX(1); }
+    .nav-cta {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--font-body); font-size: 14px; font-weight: 600;
+      padding: 10px 22px; border-radius: var(--radius);
+      border: none; cursor: none; transition: all 0.2s;
+    }
+    .btn-ghost {
+      background: transparent; color: var(--text2);
+      border: 1px solid var(--border2);
+    }
+    .btn-ghost:hover { color: var(--text); border-color: var(--text3); }
+    .btn-primary {
+      background: var(--amber); color: #080B0F; font-weight: 700;
+    }
+    .btn-primary:hover {
+      background: #FFB800;
+      box-shadow: 0 0 30px rgba(240,165,0,0.4);
+      transform: translateY(-1px);
+    }
+
+    /* ═══════════════════════════════════════════
+       HERO
+    ═══════════════════════════════════════════ */
+    #hero {
+      position: relative; min-height: 100vh;
+      display: flex; align-items: center;
+      padding-top: 100px; overflow: hidden;
+    }
+    .hero-glow {
+      position: absolute; top: -200px; left: 50%; transform: translateX(-50%);
+      width: 800px; height: 600px;
+      background: radial-gradient(ellipse, rgba(240,165,0,0.1) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .hero-glow-2 {
+      position: absolute; bottom: -100px; right: -200px;
+      width: 500px; height: 500px;
+      background: radial-gradient(ellipse, rgba(0,201,167,0.06) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .hero-content {
+      position: relative; z-index: 2;
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 80px; align-items: center;
+      padding: 60px 0;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      padding: 8px 16px; border-radius: 100px;
+      font-size: 13px; font-weight: 500; color: var(--text2);
+      margin-bottom: 28px;
+    }
+    .hero-badge .dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--teal);
+      box-shadow: 0 0 8px var(--teal);
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(0.8); }
+    }
+    .hero-headline {
+      font-family: var(--font-head); font-size: clamp(42px, 5vw, 64px);
+      font-weight: 800; line-height: 1.06; letter-spacing: -0.03em;
+      margin-bottom: 24px;
+    }
+    .hero-headline .line { display: block; overflow: hidden; }
+    .hero-headline .word {
+      display: inline-block;
+      animation: slide-up 0.8s cubic-bezier(0.16,1,0.3,1) both;
+    }
+    .hero-headline .line:nth-child(2) .word { animation-delay: 0.08s; }
+    .hero-headline .line:nth-child(3) .word { animation-delay: 0.16s; }
+    @keyframes slide-up {
+      from { transform: translateY(100%); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+    .accent-text {
+      background: linear-gradient(135deg, var(--amber) 0%, #FF9900 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-sub {
+      font-size: 17px; line-height: 1.7; color: var(--text2);
+      max-width: 460px; margin-bottom: 40px;
+      animation: fade-up 0.8s 0.3s cubic-bezier(0.16,1,0.3,1) both;
+    }
+    @keyframes fade-up {
+      from { transform: translateY(20px); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+    .hero-actions {
+      display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+      margin-bottom: 52px;
+      animation: fade-up 0.8s 0.45s cubic-bezier(0.16,1,0.3,1) both;
+    }
+    .btn-xl { padding: 14px 28px; font-size: 15px; }
+    .hero-trust {
+      display: flex; align-items: center; gap: 16px;
+      font-size: 13px; color: var(--text3);
+      animation: fade-up 0.8s 0.55s cubic-bezier(0.16,1,0.3,1) both;
+    }
+    .avatars { display: flex; }
+    .avatar {
+      width: 30px; height: 30px; border-radius: 50%;
+      border: 2px solid var(--bg);
+      margin-left: -8px;
+      background: linear-gradient(135deg, var(--surface) 0%, var(--bg3) 100%);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700;
+      color: var(--text2);
+      overflow: hidden;
+    }
+    .avatar:first-child { margin-left: 0; }
+
+    /* Hero right — Dashboard Preview */
+    .hero-visual {
+      position: relative;
+      animation: fade-up 0.8s 0.2s cubic-bezier(0.16,1,0.3,1) both;
+    }
+    .dashboard-mockup {
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.6), 0 0 0 1px var(--border);
+    }
+    .mockup-bar {
+      background: var(--bg2); padding: 12px 16px;
+      display: flex; align-items: center; gap: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .mockup-dots { display: flex; gap: 6px; }
+    .mockup-dots span {
+      width: 10px; height: 10px; border-radius: 50%;
+    }
+    .mockup-dots span:nth-child(1) { background: #FF5F56; }
+    .mockup-dots span:nth-child(2) { background: #FFBD2E; }
+    .mockup-dots span:nth-child(3) { background: #27C93F; }
+    .mockup-url {
+      flex: 1; background: var(--bg3);
+      border-radius: 6px; padding: 5px 12px;
+      font-family: var(--font-mono); font-size: 11px; color: var(--text3);
+    }
+    .mockup-body { padding: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .mockup-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 16px;
+    }
+    .mockup-card-label {
+      font-family: var(--font-mono); font-size: 10px;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--text3); margin-bottom: 8px;
+    }
+    .mockup-card-val {
+      font-family: var(--font-head); font-size: 28px;
+      font-weight: 800; letter-spacing: -0.02em;
+    }
+    .mockup-card-val.amber { color: var(--amber); }
+    .mockup-card-val.teal { color: var(--teal); }
+    .mockup-card-val.coral { color: var(--coral); }
+    .mockup-mini-bar {
+      height: 4px; border-radius: 2px;
+      background: var(--bg3); margin-top: 10px; overflow: hidden;
+    }
+    .mockup-mini-bar-fill { height: 100%; border-radius: 2px; }
+    .mockup-full { grid-column: 1 / -1; }
+    .radar-rings { display: flex; justify-content: center; padding: 8px 0; }
+    .radar-rings svg { width: 120px; height: 120px; }
+    .mockup-traits {
+      display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px;
+    }
+    .trait-chip {
+      font-family: var(--font-mono); font-size: 10px;
+      padding: 3px 8px; border-radius: 4px;
+      background: var(--bg3); color: var(--text2);
+      border: 1px solid var(--border);
+    }
+    .trait-chip.hi { color: var(--amber); border-color: rgba(240,165,0,0.3); background: var(--amber-glow); }
+
+    /* Floating badges */
+    .float-badge {
+      position: absolute; background: var(--surface);
+      border: 1px solid var(--border2); border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 12px; font-weight: 600;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .float-badge-1 { top: -20px; right: -20px; animation: float1 4s ease-in-out infinite; }
+    .float-badge-2 { bottom: 30px; left: -30px; animation: float2 5s ease-in-out infinite; }
+    @keyframes float1 {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    @keyframes float2 {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(6px); }
+    }
+
+    /* ═══════════════════════════════════════════
+       STATS BAR
+    ═══════════════════════════════════════════ */
+    #stats {
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      padding: 40px 0;
+      background: var(--bg2);
+    }
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 0; text-align: center;
+    }
+    .stat-item {
+      padding: 0 20px;
+      border-right: 1px solid var(--border);
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-num {
+      font-family: var(--font-head); font-size: 40px;
+      font-weight: 800; letter-spacing: -0.03em;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .stat-num .unit { font-size: 24px; opacity: 0.6; }
+    .stat-label { font-size: 13px; color: var(--text2); }
+
+    /* ═══════════════════════════════════════════
+       MARQUEE
+    ═══════════════════════════════════════════ */
+    .marquee-section {
+      padding: 20px 0; overflow: hidden;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg2);
+    }
+    .marquee-track {
+      display: flex; gap: 0; width: max-content;
+      animation: marquee 25s linear infinite;
+    }
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+    .marquee-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 0 28px; border-right: 1px solid var(--border);
+      font-family: var(--font-mono); font-size: 12px;
+      color: var(--text3); white-space: nowrap;
+    }
+    .marquee-icon { font-size: 14px; }
+
+    /* ═══════════════════════════════════════════
+       SECTION SHARED
+    ═══════════════════════════════════════════ */
+    .section { padding: 100px 0; position: relative; }
+    .section-header { text-align: center; margin-bottom: 64px; }
+    .section-title {
+      font-family: var(--font-head); font-size: clamp(32px, 4vw, 48px);
+      font-weight: 800; letter-spacing: -0.03em; line-height: 1.1;
+      margin-bottom: 16px;
+    }
+    .section-sub {
+      font-size: 16px; color: var(--text2); max-width: 520px;
+      margin: 0 auto; line-height: 1.7;
+    }
+
+    /* ═══════════════════════════════════════════
+       PILLARS (FEATURES)
+    ═══════════════════════════════════════════ */
+    #pillars { background: var(--bg); }
+    .pillars-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 1px; background: var(--border);
+      border: 1px solid var(--border); border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    .pillar-card {
+      background: var(--bg);
+      padding: 36px 32px;
+      position: relative; overflow: hidden;
+      transition: background 0.3s;
+    }
+    .pillar-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 2px;
+      background: transparent;
+      transition: background 0.3s;
+    }
+    .pillar-card:hover { background: var(--bg2); }
+    .pillar-card:hover::before { background: var(--amber); }
+    .pillar-card:nth-child(2):hover::before { background: var(--teal); }
+    .pillar-card:nth-child(3):hover::before { background: var(--coral); }
+    .pillar-card:nth-child(4):hover::before { background: #A78BFA; }
+    .pillar-card:nth-child(5):hover::before { background: #60A5FA; }
+    .pillar-card:nth-child(6):hover::before { background: #34D399; }
+    .pillar-icon {
+      width: 48px; height: 48px;
+      border-radius: 12px; display: flex; align-items: center; justify-content: center;
+      margin-bottom: 20px; font-size: 22px;
+    }
+    .pillar-num {
+      font-family: var(--font-mono); font-size: 11px;
+      color: var(--text3); margin-bottom: 14px;
+      letter-spacing: 0.1em;
+    }
+    .pillar-title {
+      font-family: var(--font-head); font-size: 19px;
+      font-weight: 700; margin-bottom: 10px;
+      letter-spacing: -0.02em; line-height: 1.3;
+    }
+    .pillar-body { font-size: 14px; color: var(--text2); line-height: 1.65; }
+    .pillar-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px; }
+    .chip {
+      font-family: var(--font-mono); font-size: 10px;
+      padding: 4px 9px; border-radius: 4px;
+      background: var(--bg3); color: var(--text3);
+      border: 1px solid var(--border);
+    }
+
+    /* ═══════════════════════════════════════════
+       HOW IT WORKS
+    ═══════════════════════════════════════════ */
+    #how { background: var(--bg2); }
+    .steps-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 24px; position: relative;
+    }
+    .steps-grid::before {
+      content: '';
+      position: absolute; top: 28px; left: 10%; right: 10%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border2) 20%, var(--border2) 80%, transparent);
+      z-index: 0;
+    }
+    .step {
+      position: relative; z-index: 1; text-align: center;
+    }
+    .step-num {
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-mono); font-size: 15px; font-weight: 500;
+      margin: 0 auto 20px;
+      border: 1px solid var(--border2);
+      background: var(--surface);
+      position: relative;
+    }
+    .step:nth-child(1) .step-num { color: var(--amber); border-color: rgba(240,165,0,0.3); background: var(--amber-glow); }
+    .step:nth-child(2) .step-num { color: var(--teal);  border-color: rgba(0,201,167,0.3);  background: var(--teal-glow); }
+    .step:nth-child(3) .step-num { color: #A78BFA; border-color: rgba(167,139,250,0.3); background: rgba(167,139,250,0.08); }
+    .step:nth-child(4) .step-num { color: #60A5FA; border-color: rgba(96,165,250,0.3); background: rgba(96,165,250,0.08); }
+    .step-title {
+      font-family: var(--font-head); font-size: 17px;
+      font-weight: 700; margin-bottom: 8px; letter-spacing: -0.01em;
+    }
+    .step-body { font-size: 13px; color: var(--text2); line-height: 1.6; }
+
+    /* ═══════════════════════════════════════════
+       DASHBOARD PREVIEW SECTION
+    ═══════════════════════════════════════════ */
+    #dashboard-preview { background: var(--bg); overflow: hidden; }
+    .preview-layout {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 64px; align-items: center;
+    }
+    .preview-text .tag { margin-bottom: 20px; }
+    .preview-title {
+      font-family: var(--font-head); font-size: clamp(28px, 3vw, 42px);
+      font-weight: 800; line-height: 1.1; letter-spacing: -0.03em;
+      margin-bottom: 18px;
+    }
+    .preview-body { font-size: 15px; color: var(--text2); line-height: 1.7; margin-bottom: 28px; }
+    .preview-features { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+    .preview-features li {
+      display: flex; align-items: flex-start; gap: 12px;
+      font-size: 14px; color: var(--text2);
+    }
+    .preview-features li::before {
+      content: '→';
+      color: var(--amber); font-weight: 700; flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .preview-features li strong { color: var(--text); }
+
+    /* Dashboard UI mock */
+    .dash-ui {
+      background: var(--surface);
+      border: 1px solid var(--border2); border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+    }
+    .dash-topbar {
+      background: var(--bg2); padding: 14px 20px;
+      display: flex; align-items: center; gap: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .dash-user {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .dash-avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--amber), #FF9900);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; color: #080B0F;
+    }
+    .dash-name { font-size: 13px; font-weight: 600; }
+    .dash-sub { font-size: 11px; color: var(--text3); }
+    .dash-tabs {
+      display: flex; gap: 4px; margin-left: auto;
+    }
+    .dash-tab {
+      font-size: 11px; font-weight: 500; padding: 5px 12px;
+      border-radius: 6px; color: var(--text3);
+      background: transparent; border: none; cursor: none;
+    }
+    .dash-tab.active { background: var(--amber-glow); color: var(--amber); }
+    .dash-body { padding: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .dash-widget {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 14px;
+    }
+    .dash-widget.full { grid-column: 1 / -1; }
+    .dw-title {
+      font-family: var(--font-mono); font-size: 10px;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--text3); margin-bottom: 12px;
+    }
+
+    /* Kanban mini */
+    .kanban-cols { display: flex; gap: 8px; }
+    .k-col { flex: 1; }
+    .k-col-head {
+      font-size: 10px; font-weight: 600; color: var(--text3);
+      margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.08em;
+    }
+    .k-card {
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 6px; padding: 8px 10px;
+      font-size: 11px; color: var(--text2); margin-bottom: 5px;
+      border-left: 2px solid;
+    }
+    .k-card.todo   { border-left-color: var(--text3); }
+    .k-card.doing  { border-left-color: var(--amber); }
+    .k-card.done   { border-left-color: var(--teal); }
+
+    /* Progress bars */
+    .skill-bar { margin-bottom: 8px; }
+    .skill-bar-top { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 11px; }
+    .skill-bar-bg { height: 5px; border-radius: 3px; background: var(--bg3); overflow: hidden; }
+    .skill-bar-fill { height: 100%; border-radius: 3px; }
+
+    /* Sparkline chart */
+    .spark-chart {
+      display: flex; align-items: flex-end;
+      gap: 3px; height: 40px; margin-top: 8px;
+    }
+    .spark-bar {
+      flex: 1; border-radius: 3px 3px 0 0;
+      background: var(--amber-glow);
+      border: 1px solid rgba(240,165,0,0.2);
+      transition: background 0.2s;
+      min-height: 4px;
+    }
+    .spark-bar.hi { background: var(--amber-glow); border-color: rgba(240,165,0,0.5); }
+    .spark-bar.active { background: var(--amber); border-color: var(--amber); }
+
+    /* ═══════════════════════════════════════════
+       CAREER INTELLIGENCE (O*NET + Trends)
+    ═══════════════════════════════════════════ */
+    #intelligence { background: var(--bg2); }
+    .intel-grid {
+      display: grid; grid-template-columns: 3fr 2fr; gap: 32px; align-items: start;
+    }
+    .job-trend-table { }
+    .jt-header {
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 0; padding: 10px 16px;
+      background: var(--bg3); border-radius: var(--radius) var(--radius) 0 0;
+      border: 1px solid var(--border);
+      font-family: var(--font-mono); font-size: 10px;
+      text-transform: uppercase; letter-spacing: 0.1em; color: var(--text3);
+    }
+    .jt-row {
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 0; padding: 14px 16px;
+      border: 1px solid var(--border); border-top: none;
+      transition: background 0.2s;
+    }
+    .jt-row:last-child { border-radius: 0 0 var(--radius) var(--radius); }
+    .jt-row:hover { background: var(--surface); }
+    .jt-job { font-size: 13px; font-weight: 500; }
+    .jt-val { font-size: 12px; font-family: var(--font-mono); }
+    .jt-demand { color: var(--teal); }
+    .jt-growth { color: var(--amber); display: flex; align-items: center; gap: 3px; }
+    .jt-growth.neg { color: var(--coral); }
+    .jt-salary { color: var(--text2); }
+    .badge-trending {
+      display: inline-block; font-size: 9px; font-family: var(--font-mono);
+      padding: 2px 6px; border-radius: 3px;
+      background: rgba(0,201,167,0.15); color: var(--teal);
+      border: 1px solid rgba(0,201,167,0.25); margin-left: 6px;
+    }
+
+    .intel-aside { display: flex; flex-direction: column; gap: 16px; }
+    .skill-demand-card {
+      background: var(--surface); border: 1px solid var(--border2);
+      border-radius: var(--radius); padding: 20px;
+    }
+    .sdc-title { font-family: var(--font-head); font-size: 16px; font-weight: 700; margin-bottom: 16px; }
+    .sdc-bar { margin-bottom: 10px; }
+    .sdc-bar-top { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 12px; }
+    .sdc-bar-track { height: 6px; border-radius: 3px; background: var(--bg3); overflow: hidden; }
+    .sdc-bar-fill { height: 100%; border-radius: 3px; }
+
+    /* ═══════════════════════════════════════════
+       RESOURCE FINDER
+    ═══════════════════════════════════════════ */
+    #resources { background: var(--bg); }
+    .resource-demo {
+      background: var(--surface); border: 1px solid var(--border2);
+      border-radius: var(--radius-lg); overflow: hidden; max-width: 800px; margin: 0 auto;
+    }
+    .res-search {
+      padding: 20px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 12px;
+    }
+    .res-search-icon { color: var(--text3); font-size: 16px; }
+    .res-search-input {
+      flex: 1; background: none; border: none; outline: none;
+      font-family: var(--font-body); font-size: 15px; color: var(--text);
+    }
+    .res-search-input::placeholder { color: var(--text3); }
+    .res-filters { display: flex; gap: 8px; }
+    .res-filter {
+      font-family: var(--font-mono); font-size: 10px;
+      padding: 4px 10px; border-radius: 4px;
+      background: var(--amber-glow); color: var(--amber);
+      border: 1px solid rgba(240,165,0,0.25);
+    }
+    .res-results { }
+    .res-item {
+      display: flex; align-items: center; gap: 16px;
+      padding: 16px 20px; border-bottom: 1px solid var(--border);
+      transition: background 0.2s;
+    }
+    .res-item:hover { background: var(--bg2); }
+    .res-item:last-child { border-bottom: none; }
+    .res-platform {
+      width: 36px; height: 36px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; flex-shrink: 0;
+    }
+    .res-item-body { flex: 1; }
+    .res-item-title { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
+    .res-item-meta { font-size: 12px; color: var(--text3); display: flex; gap: 12px; }
+    .res-item-score {
+      font-family: var(--font-mono); font-size: 13px; font-weight: 500;
+      color: var(--amber); background: var(--amber-glow);
+      padding: 4px 10px; border-radius: 6px;
+      border: 1px solid rgba(240,165,0,0.2);
+    }
+
+    /* ═══════════════════════════════════════════
+       PSYCHOMETRIC TEASER
+    ═══════════════════════════════════════════ */
+    #psych { background: var(--bg2); }
+    .psych-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
+    .psych-visual { position: relative; }
+    .radar-card {
+      background: var(--surface); border: 1px solid var(--border2);
+      border-radius: var(--radius-lg); padding: 28px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    }
+    .radar-title { font-family: var(--font-head); font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+    .radar-sub { font-size: 13px; color: var(--text2); margin-bottom: 20px; }
+    .radar-svg-wrap { display: flex; justify-content: center; }
+    .trait-legend { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 20px; }
+    .trait-leg-item { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+    .trait-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+    /* ═══════════════════════════════════════════
+       TESTIMONIALS
+    ═══════════════════════════════════════════ */
+    #testimonials { background: var(--bg); }
+    .testi-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+    }
+    .testi-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 28px;
+      position: relative; overflow: hidden;
+      transition: border-color 0.3s, transform 0.3s;
+    }
+    .testi-card:hover { border-color: var(--border2); transform: translateY(-3px); }
+    .testi-quote-mark {
+      font-family: var(--font-head); font-size: 64px;
+      line-height: 0.5; color: var(--amber); opacity: 0.3;
+      margin-bottom: 20px; display: block;
+    }
+    .testi-text { font-size: 14px; color: var(--text2); line-height: 1.7; margin-bottom: 20px; }
+    .testi-user { display: flex; align-items: center; gap: 12px; }
+    .testi-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--bg3); border: 1px solid var(--border2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700; color: var(--text2);
+    }
+    .testi-name { font-size: 13px; font-weight: 600; }
+    .testi-role { font-size: 12px; color: var(--text3); }
+    .stars { color: var(--amber); font-size: 12px; letter-spacing: 1px; margin-bottom: 16px; }
+
+    /* ═══════════════════════════════════════════
+       CTA SECTION
+    ═══════════════════════════════════════════ */
+    #cta {
+      background: var(--bg2); padding: 120px 0;
+      position: relative; overflow: hidden;
+    }
+    .cta-glow {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px; height: 400px;
+      background: radial-gradient(ellipse, rgba(240,165,0,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .cta-inner { text-align: center; position: relative; z-index: 2; }
+    .cta-title {
+      font-family: var(--font-head); font-size: clamp(36px, 5vw, 60px);
+      font-weight: 800; letter-spacing: -0.03em; line-height: 1.08;
+      margin-bottom: 20px;
+    }
+    .cta-sub { font-size: 17px; color: var(--text2); margin-bottom: 40px; }
+    .cta-actions { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
+    .cta-note { font-size: 13px; color: var(--text3); margin-top: 20px; }
+
+    /* ═══════════════════════════════════════════
+       FOOTER
+    ═══════════════════════════════════════════ */
+    footer {
+      background: var(--bg); border-top: 1px solid var(--border);
+      padding: 60px 0 32px;
+    }
+    .footer-grid {
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 48px; margin-bottom: 48px;
+    }
+    .footer-brand .logo { margin-bottom: 14px; }
+    .footer-brand-sub { font-size: 13px; color: var(--text3); line-height: 1.6; max-width: 240px; }
+    .footer-col-title {
+      font-family: var(--font-mono); font-size: 11px;
+      text-transform: uppercase; letter-spacing: 0.12em;
+      color: var(--text3); margin-bottom: 16px;
+    }
+    .footer-links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer-links a { font-size: 14px; color: var(--text2); transition: color 0.2s; }
+    .footer-links a:hover { color: var(--amber); }
+    .footer-bottom {
+      border-top: 1px solid var(--border); padding-top: 24px;
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 13px; color: var(--text3);
+    }
+    .footer-legal { display: flex; gap: 24px; }
+    .footer-legal a { color: var(--text3); transition: color 0.2s; }
+    .footer-legal a:hover { color: var(--text); }
+
+    /* ═══════════════════════════════════════════
+       SCROLL REVEAL
+    ═══════════════════════════════════════════ */
+    .reveal {
+      opacity: 0; transform: translateY(28px);
+      transition: opacity 0.7s cubic-bezier(0.16,1,0.3,1),
+                  transform 0.7s cubic-bezier(0.16,1,0.3,1);
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+
+    /* ═══════════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════════ */
+    @media (max-width: 900px) {
+      .hero-content, .preview-layout, .psych-layout, .intel-grid { grid-template-columns: 1fr; gap: 40px; }
+      .pillars-grid { grid-template-columns: 1fr 1fr; }
+      .steps-grid { grid-template-columns: 1fr 1fr; }
+      .steps-grid::before { display: none; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .testi-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      .nav-links { display: none; }
+      .hero-visual { display: none; }
+    }
+    @media (max-width: 600px) {
+      .pillars-grid { grid-template-columns: 1fr; }
+      .steps-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Noise + cursor -->
+<div class="noise"></div>
+<div class="cursor"><div class="cursor-dot"></div><div class="cursor-ring"></div></div>
+
+<!-- ═══════════════════════════════════════════
+     NAV
+═══════════════════════════════════════════ -->
+<nav id="navbar">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="#" class="logo">
+        <div class="logo-mark">
+          <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2 7L5.5 3L9 7L5.5 11L2 7Z" fill="#080B0F"/>
+            <path d="M7 7L10.5 3L14 7L10.5 11L7 7Z" fill="#080B0F" opacity="0.5"/>
+          </svg>
+        </div>
+        SOL<span>VO</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#pillars">Features</a></li>
+        <li><a href="#intelligence">Career Intel</a></li>
+        <li><a href="#dashboard-preview">Dashboard</a></li>
+        <li><a href="#resources">Resources</a></li>
+        <li><a href="#psych">Assessment</a></li>
+      </ul>
+      <div class="nav-cta">
+        <button class="btn btn-ghost">Sign In</button>
+        <button class="btn btn-primary">Get Started Free →</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════
+     HERO
+═══════════════════════════════════════════ -->
+<section id="hero">
+  <div class="grid-bg"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-glow-2"></div>
+  <div class="container">
+    <div class="hero-content">
+      <!-- Left -->
+      <div class="hero-left">
+        <div class="hero-badge">
+          <span class="dot"></span>
+          Now live — v1.0 Early Access Open
+        </div>
+        <h1 class="hero-headline">
+          <span class="line"><span class="word">Engineer</span></span>
+          <span class="line"><span class="word">Your&nbsp;<span class="accent-text">Career</span></span></span>
+          <span class="line"><span class="word">Deliberately.</span></span>
+        </h1>
+        <p class="hero-sub">
+          SOLVO is your all-in-one career intelligence platform — psychometric assessments, real-time job market data, curated learning paths, and a personal productivity dashboard that works on day one.
+        </p>
+        <div class="hero-actions">
+          <button class="btn btn-primary btn-xl">Start for Free — It's Free ↗</button>
+          <button class="btn btn-ghost btn-xl">See How It Works</button>
+        </div>
+        <div class="hero-trust">
+          <div class="avatars">
+            <div class="avatar">R</div>
+            <div class="avatar">S</div>
+            <div class="avatar">A</div>
+            <div class="avatar">P</div>
+            <div class="avatar">+</div>
+          </div>
+          <span>Trusted by <strong>2,400+</strong> students & early career professionals</span>
+        </div>
+      </div>
+
+      <!-- Right — Dashboard Preview -->
+      <div class="hero-visual">
+        <div class="float-badge float-badge-1">
+          <span style="color:var(--teal)">▲</span>
+          <span>UI/UX Designer — <strong style="color:var(--teal)">+28% demand</strong></span>
+        </div>
+        <div class="float-badge float-badge-2">
+          <span>🎯</span>
+          <span>Career match: <strong style="color:var(--amber)">92% fit</strong></span>
+        </div>
+        <div class="dashboard-mockup">
+          <div class="mockup-bar">
+            <div class="mockup-dots">
+              <span></span><span></span><span></span>
+            </div>
+            <div class="mockup-url">app.solvo.ai/dashboard</div>
+          </div>
+          <div class="mockup-body">
+            <div class="mockup-card">
+              <div class="mockup-card-label">Career Match Score</div>
+              <div class="mockup-card-val amber">92<span style="font-size:16px;opacity:0.5">%</span></div>
+              <div class="mockup-mini-bar"><div class="mockup-mini-bar-fill" style="width:92%;background:var(--amber)"></div></div>
+            </div>
+            <div class="mockup-card">
+              <div class="mockup-card-label">Skills Completed</div>
+              <div class="mockup-card-val teal">14<span style="font-size:16px;opacity:0.5">/30</span></div>
+              <div class="mockup-mini-bar"><div class="mockup-mini-bar-fill" style="width:47%;background:var(--teal)"></div></div>
+            </div>
+            <div class="mockup-card mockup-full">
+              <div class="mockup-card-label">Big Five Personality Profile</div>
+              <div style="display:flex;align-items:center;gap:16px">
+                <div class="radar-rings">
+                  <svg viewBox="0 0 120 120">
+                    <polygon points="60,10 110,35 110,85 60,110 10,85 10,35" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+                    <polygon points="60,28 93,44 93,76 60,92 27,76 27,44" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+                    <polygon points="60,46 76,54 76,66 60,74 44,66 44,54" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+                    <polygon points="60,18 96,38 96,82 60,102 24,82 24,38" fill="rgba(240,165,0,0.08)" stroke="var(--amber)" stroke-width="1.5" opacity="0.7"/>
+                    <circle cx="60" cy="18" r="3" fill="var(--amber)"/>
+                    <circle cx="96" cy="38" r="3" fill="var(--amber)"/>
+                    <circle cx="96" cy="82" r="3" fill="var(--amber)"/>
+                    <circle cx="60" cy="102" r="3" fill="var(--amber)"/>
+                    <circle cx="24" cy="82" r="3" fill="var(--amber)"/>
+                    <circle cx="24" cy="38" r="3" fill="var(--amber)"/>
+                  </svg>
+                </div>
+                <div class="mockup-traits">
+                  <span class="trait-chip hi">Openness · 88</span>
+                  <span class="trait-chip hi">Conscientiousness · 76</span>
+                  <span class="trait-chip">Extroversion · 54</span>
+                  <span class="trait-chip">Agreeableness · 70</span>
+                  <span class="trait-chip">Neuroticism · 32</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     MARQUEE
+═══════════════════════════════════════════ -->
+<div class="marquee-section">
+  <div class="marquee-track" id="marqueeTrack">
+    <div class="marquee-item"><span class="marquee-icon">🧠</span> Psychometric Assessment</div>
+    <div class="marquee-item"><span class="marquee-icon">📊</span> Career Intelligence Database</div>
+    <div class="marquee-item"><span class="marquee-icon">🗺️</span> Interactive Skill Roadmaps</div>
+    <div class="marquee-item"><span class="marquee-icon">⚡</span> Personal Productivity Dashboard</div>
+    <div class="marquee-item"><span class="marquee-icon">🔍</span> Resource Finder Engine</div>
+    <div class="marquee-item"><span class="marquee-icon">📈</span> Real-Time Market Trends</div>
+    <div class="marquee-item"><span class="marquee-icon">🎯</span> Career Aptitude Test (CAT-style)</div>
+    <div class="marquee-item"><span class="marquee-icon">📋</span> Kanban & Goal Tracking</div>
+    <!-- Duplicate for seamless loop -->
+    <div class="marquee-item"><span class="marquee-icon">🧠</span> Psychometric Assessment</div>
+    <div class="marquee-item"><span class="marquee-icon">📊</span> Career Intelligence Database</div>
+    <div class="marquee-item"><span class="marquee-icon">🗺️</span> Interactive Skill Roadmaps</div>
+    <div class="marquee-item"><span class="marquee-icon">⚡</span> Personal Productivity Dashboard</div>
+    <div class="marquee-item"><span class="marquee-icon">🔍</span> Resource Finder Engine</div>
+    <div class="marquee-item"><span class="marquee-icon">📈</span> Real-Time Market Trends</div>
+    <div class="marquee-item"><span class="marquee-icon">🎯</span> Career Aptitude Test (CAT-style)</div>
+    <div class="marquee-item"><span class="marquee-icon">📋</span> Kanban & Goal Tracking</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     STATS
+═══════════════════════════════════════════ -->
+<section id="stats">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-item reveal">
+        <div class="stat-num" style="color:var(--amber)">8<span class="unit">+</span></div>
+        <div class="stat-label">Career tools in one platform</div>
+      </div>
+      <div class="stat-item reveal reveal-delay-1">
+        <div class="stat-num" style="color:var(--teal)">500<span class="unit">+</span></div>
+        <div class="stat-label">Curated learning resources</div>
+      </div>
+      <div class="stat-item reveal reveal-delay-2">
+        <div class="stat-num" style="color:#A78BFA">120<span class="unit">+</span></div>
+        <div class="stat-label">In-demand job roles tracked</div>
+      </div>
+      <div class="stat-item reveal reveal-delay-3">
+        <div class="stat-num" style="color:var(--coral)">₹99</div>
+        <div class="stat-label">One-time Premium unlock price</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     PILLARS
+═══════════════════════════════════════════ -->
+<section id="pillars" class="section">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="tag" style="margin:0 auto 16px">Platform Pillars</div>
+      <h2 class="section-title">Everything you need.<br>Nothing you don't.</h2>
+      <p class="section-sub">Six precision-engineered modules that take you from "what should I do?" to "I'm doing it — and tracking every step."</p>
+    </div>
+    <div class="pillars-grid reveal">
+
+      <div class="pillar-card">
+        <div class="pillar-num">01</div>
+        <div class="pillar-icon" style="background:var(--amber-glow)">🧠</div>
+        <h3 class="pillar-title">Psychometric Assessment Engine</h3>
+        <p class="pillar-body">50-question Big Five personality test with weighted scoring. Get a beautiful radar chart of your Openness, Conscientiousness, Extroversion, Agreeableness & Neuroticism scores — and discover which careers align with your psychology.</p>
+        <div class="pillar-chips">
+          <span class="chip">Big Five</span>
+          <span class="chip">Radar Chart</span>
+          <span class="chip">Career Match</span>
+        </div>
+      </div>
+
+      <div class="pillar-card">
+        <div class="pillar-num">02</div>
+        <div class="pillar-icon" style="background:var(--teal-glow)">🎯</div>
+        <h3 class="pillar-title">Career Aptitude Test (CAT-Style)</h3>
+        <p class="pillar-body">30-question adaptive aptitude assessment across Numerical, Creative, and Verbal reasoning. Scored instantly with a detailed breakdown — similar to what Mindler and iDreamCareer offer, but smarter and faster.</p>
+        <div class="pillar-chips">
+          <span class="chip">MCQ · 30 Qs</span>
+          <span class="chip">Numerical</span>
+          <span class="chip">Verbal</span>
+          <span class="chip">Creative</span>
+        </div>
+      </div>
+
+      <div class="pillar-card">
+        <div class="pillar-num">03</div>
+        <div class="pillar-icon" style="background:rgba(167,139,250,0.1)">📊</div>
+        <h3 class="pillar-title">Career Intelligence & Job Market Data</h3>
+        <p class="pillar-body">Real-time trends for 120+ roles — salary bands, demand scores, top skills, and growth trajectories. Think O*NET meets LinkedIn Job Insights, built for the Indian market. The Job Market Time Machine™ shows where skills are headed.</p>
+        <div class="pillar-chips">
+          <span class="chip">O*NET-style</span>
+          <span class="chip">Salary Data</span>
+          <span class="chip">Trend Charts</span>
+        </div>
+      </div>
+
+      <div class="pillar-card">
+        <div class="pillar-num">04</div>
+        <div class="pillar-icon" style="background:rgba(96,165,250,0.1)">🗺️</div>
+        <h3 class="pillar-title">Interactive Career Roadmaps</h3>
+        <p class="pillar-body">React Flow-powered visual roadmaps — like roadmap.sh but personalized to your personality profile. Milestone nodes link directly to curated resources. Premium users get full interactive, phase-by-phase learning paths.</p>
+        <div class="pillar-chips">
+          <span class="chip">React Flow</span>
+          <span class="chip">Personalised</span>
+          <span class="chip">roadmap.sh-style</span>
+        </div>
+      </div>
+
+      <div class="pillar-card">
+        <div class="pillar-num">05</div>
+        <div class="pillar-icon" style="background:rgba(52,211,153,0.1)">🔍</div>
+        <h3 class="pillar-title">Precision Resource Finder</h3>
+        <p class="pillar-body">Search 500+ vetted learning resources across YouTube, Coursera, Udemy, Great Learning, NPTEL, and more. Filter by platform, cost, duration, difficulty, and skill — and get a relevance score so you always find the best option first.</p>
+        <div class="pillar-chips">
+          <span class="chip">YouTube</span>
+          <span class="chip">Coursera</span>
+          <span class="chip">Udemy</span>
+          <span class="chip">+12 more</span>
+        </div>
+      </div>
+
+      <div class="pillar-card">
+        <div class="pillar-num">06</div>
+        <div class="pillar-icon" style="background:rgba(251,146,60,0.1)">⚡</div>
+        <h3 class="pillar-title">Personal Productivity Dashboard</h3>
+        <p class="pillar-body">A Notion-level dashboard that's pre-filled and ready on day one. No setup required. Kanban boards, to-do lists, SMART goals, weekly schedules, OKRs, and performance charts — all auto-populated based on your roadmap and career goals.</p>
+        <div class="pillar-chips">
+          <span class="chip">Kanban</span>
+          <span class="chip">SMART Goals</span>
+          <span class="chip">OKRs</span>
+          <span class="chip">Pre-filled</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     HOW IT WORKS
+═══════════════════════════════════════════ -->
+<section id="how" class="section">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="tag" style="margin:0 auto 16px">The Flow</div>
+      <h2 class="section-title">From uncertain to unstoppable<br>in 4 steps.</h2>
+    </div>
+    <div class="steps-grid">
+      <div class="step reveal">
+        <div class="step-num">01</div>
+        <h3 class="step-title">Take the Assessment</h3>
+        <p class="step-body">Complete the 50-question Big Five psychometric test and the 30-question aptitude test. Takes 20 minutes total. Results are instant.</p>
+      </div>
+      <div class="step reveal reveal-delay-1">
+        <div class="step-num">02</div>
+        <h3 class="step-title">Discover Your Path</h3>
+        <p class="step-body">Your personality profile and aptitude scores unlock your personalized career match, radar chart, and a ranked list of ideal career paths.</p>
+      </div>
+      <div class="step reveal reveal-delay-2">
+        <div class="step-num">03</div>
+        <h3 class="step-title">Follow the Roadmap</h3>
+        <p class="step-body">Get an interactive, skill-by-skill roadmap. Each node links to the best learning resource for that topic — hand-curated, relevance-scored.</p>
+      </div>
+      <div class="step reveal reveal-delay-3">
+        <div class="step-num">04</div>
+        <h3 class="step-title">Track in the Dashboard</h3>
+        <p class="step-body">Your pre-built productivity dashboard syncs with your roadmap. Every skill you complete updates your Kanban, goals, and performance charts.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     DASHBOARD PREVIEW
+═══════════════════════════════════════════ -->
+<section id="dashboard-preview" class="section">
+  <div class="container">
+    <div class="preview-layout">
+      <div class="preview-text reveal">
+        <div class="tag">Productivity Dashboard</div>
+        <h2 class="preview-title">A Notion dashboard,<br>but ready on<br><span class="accent-text">Day One.</span></h2>
+        <p class="preview-body">
+          Most productivity tools give you a blank canvas and expect you to build everything yourself. SOLVO ships with every block pre-built and pre-filled based on your career goals — you can start working immediately, modify as you go.
+        </p>
+        <ul class="preview-features">
+          <li><strong>Kanban Board</strong> — auto-populated with your roadmap milestones as tasks across To Do / In Progress / Done columns</li>
+          <li><strong>SMART Goal Tracker</strong> — pre-loaded weekly, monthly, and quarterly goals aligned to your career path</li>
+          <li><strong>Sprint Planner</strong> — agile-style weekly sprints with velocity charts and retrospective prompts</li>
+          <li><strong>Skill Progress Charts</strong> — visual radar and bar charts updating in real time as you check off resources</li>
+          <li><strong>Daily Schedule</strong> — time-blocked study plan based on how many hours per day you can invest</li>
+        </ul>
+      </div>
+      <div class="reveal reveal-delay-1">
+        <div class="dash-ui">
+          <div class="dash-topbar">
+            <div class="dash-user">
+              <div class="dash-avatar">R</div>
+              <div>
+                <div class="dash-name">Rahul Singh</div>
+                <div class="dash-sub">UI/UX Design Track · Week 3</div>
+              </div>
+            </div>
+            <div class="dash-tabs">
+              <button class="dash-tab active">Board</button>
+              <button class="dash-tab">Goals</button>
+              <button class="dash-tab">Stats</button>
+            </div>
+          </div>
+          <div class="dash-body">
+            <!-- Kanban -->
+            <div class="dash-widget full">
+              <div class="dw-title">Sprint Board — Week 3</div>
+              <div class="kanban-cols">
+                <div class="k-col">
+                  <div class="k-col-head">To Do (3)</div>
+                  <div class="k-card todo">Typography & Colour Theory</div>
+                  <div class="k-card todo">Usability Testing Basics</div>
+                  <div class="k-card todo">Build Case Study #1</div>
+                </div>
+                <div class="k-col">
+                  <div class="k-col-head">In Progress (2)</div>
+                  <div class="k-card doing">Figma Advanced Features</div>
+                  <div class="k-card doing">User Research Methods</div>
+                </div>
+                <div class="k-col">
+                  <div class="k-col-head">Done (5)</div>
+                  <div class="k-card done">Design Thinking</div>
+                  <div class="k-card done">Figma Essentials</div>
+                  <div class="k-card done">Wireframing</div>
+                </div>
+              </div>
+            </div>
+            <!-- Skill progress -->
+            <div class="dash-widget">
+              <div class="dw-title">Skill Progress</div>
+              <div class="skill-bar">
+                <div class="skill-bar-top"><span style="font-size:11px">Figma</span><span style="font-size:11px;color:var(--amber)">72%</span></div>
+                <div class="skill-bar-bg"><div class="skill-bar-fill" style="width:72%;background:var(--amber)"></div></div>
+              </div>
+              <div class="skill-bar">
+                <div class="skill-bar-top"><span style="font-size:11px">User Research</span><span style="font-size:11px;color:var(--teal)">48%</span></div>
+                <div class="skill-bar-bg"><div class="skill-bar-fill" style="width:48%;background:var(--teal)"></div></div>
+              </div>
+              <div class="skill-bar">
+                <div class="skill-bar-top"><span style="font-size:11px">Prototyping</span><span style="font-size:11px;color:#A78BFA">30%</span></div>
+                <div class="skill-bar-bg"><div class="skill-bar-fill" style="width:30%;background:#A78BFA"></div></div>
+              </div>
+            </div>
+            <!-- Weekly activity -->
+            <div class="dash-widget">
+              <div class="dw-title">Weekly Activity</div>
+              <div style="font-family:var(--font-mono);font-size:22px;font-weight:700;color:var(--amber)">14 <span style="font-size:12px;color:var(--text3)">hrs this week</span></div>
+              <div class="spark-chart">
+                <div class="spark-bar" style="height:40%"></div>
+                <div class="spark-bar" style="height:65%"></div>
+                <div class="spark-bar" style="height:50%"></div>
+                <div class="spark-bar hi" style="height:80%"></div>
+                <div class="spark-bar hi" style="height:90%"></div>
+                <div class="spark-bar active" style="height:100%"></div>
+                <div class="spark-bar" style="height:30%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     CAREER INTELLIGENCE
+═══════════════════════════════════════════ -->
+<section id="intelligence" class="section">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="tag" style="margin:0 auto 16px">Career Intelligence</div>
+      <h2 class="section-title">Make data-driven<br>career decisions.</h2>
+      <p class="section-sub">Live job market data for 120+ roles. Salary bands, demand signals, and skill trends — all in one place.</p>
+    </div>
+    <div class="intel-grid reveal">
+      <div>
+        <div class="job-trend-table">
+          <div class="jt-header">
+            <div>Role</div>
+            <div>Demand</div>
+            <div>Growth</div>
+            <div>Avg. Salary</div>
+          </div>
+          <div class="jt-row">
+            <div class="jt-job">UI/UX Designer <span class="badge-trending">HOT</span></div>
+            <div class="jt-val jt-demand">⬆ High</div>
+            <div class="jt-val jt-growth">+28%</div>
+            <div class="jt-val jt-salary">₹9–18 LPA</div>
+          </div>
+          <div class="jt-row">
+            <div class="jt-job">Data Scientist <span class="badge-trending">HOT</span></div>
+            <div class="jt-val jt-demand">⬆ Very High</div>
+            <div class="jt-val jt-growth">+34%</div>
+            <div class="jt-val jt-salary">₹12–28 LPA</div>
+          </div>
+          <div class="jt-row">
+            <div class="jt-job">Product Manager</div>
+            <div class="jt-val jt-demand">⬆ High</div>
+            <div class="jt-val jt-growth">+21%</div>
+            <div class="jt-val jt-salary">₹15–35 LPA</div>
+          </div>
+          <div class="jt-row">
+            <div class="jt-job">Full-Stack Engineer</div>
+            <div class="jt-val jt-demand">⬆ High</div>
+            <div class="jt-val jt-growth">+18%</div>
+            <div class="jt-val jt-salary">₹8–22 LPA</div>
+          </div>
+          <div class="jt-row">
+            <div class="jt-job">DevOps / SRE <span class="badge-trending">HOT</span></div>
+            <div class="jt-val jt-demand">⬆ Very High</div>
+            <div class="jt-val jt-growth">+42%</div>
+            <div class="jt-val jt-salary">₹14–30 LPA</div>
+          </div>
+          <div class="jt-row">
+            <div class="jt-job">Digital Marketing</div>
+            <div class="jt-val jt-demand">→ Medium</div>
+            <div class="jt-val jt-growth">+9%</div>
+            <div class="jt-val jt-salary">₹4–12 LPA</div>
+          </div>
+          <div class="jt-row">
+            <div class="jt-job">Web3 Developer</div>
+            <div class="jt-val jt-demand">→ Medium</div>
+            <div class="jt-val jt-growth neg">-4%</div>
+            <div class="jt-val jt-salary">₹10–25 LPA</div>
+          </div>
+        </div>
+      </div>
+      <div class="intel-aside reveal reveal-delay-2">
+        <div class="skill-demand-card">
+          <div class="sdc-title">🔥 Top Skills in Demand</div>
+          <div class="sdc-bar">
+            <div class="sdc-bar-top"><span>Python</span><span style="color:var(--amber)">94</span></div>
+            <div class="sdc-bar-track"><div class="sdc-bar-fill" style="width:94%;background:var(--amber)"></div></div>
+          </div>
+          <div class="sdc-bar">
+            <div class="sdc-bar-top"><span>Figma</span><span style="color:var(--teal)">88</span></div>
+            <div class="sdc-bar-track"><div class="sdc-bar-fill" style="width:88%;background:var(--teal)"></div></div>
+          </div>
+          <div class="sdc-bar">
+            <div class="sdc-bar-top"><span>SQL</span><span style="color:#A78BFA">82</span></div>
+            <div class="sdc-bar-track"><div class="sdc-bar-fill" style="width:82%;background:#A78BFA"></div></div>
+          </div>
+          <div class="sdc-bar">
+            <div class="sdc-bar-top"><span>React.js</span><span style="color:#60A5FA">79</span></div>
+            <div class="sdc-bar-track"><div class="sdc-bar-fill" style="width:79%;background:#60A5FA"></div></div>
+          </div>
+          <div class="sdc-bar">
+            <div class="sdc-bar-top"><span>Docker / K8s</span><span style="color:var(--coral)">71</span></div>
+            <div class="sdc-bar-track"><div class="sdc-bar-fill" style="width:71%;background:var(--coral)"></div></div>
+          </div>
+          <div class="sdc-bar">
+            <div class="sdc-bar-top"><span>Prompt Engineering</span><span style="color:#34D399">68</span></div>
+            <div class="sdc-bar-track"><div class="sdc-bar-fill" style="width:68%;background:#34D399"></div></div>
+          </div>
+        </div>
+        <div class="skill-demand-card" style="background:var(--amber-glow);border-color:rgba(240,165,0,0.2)">
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--amber);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.1em">⏰ Time Machine™</div>
+          <div style="font-size:14px;font-weight:600;margin-bottom:6px">Where is UI/UX heading in 2027?</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.6">AI-augmented design tools will reshape 60% of junior tasks. High demand for designers who can <strong style="color:var(--text)">prompt, prototype, and critique</strong> AI-generated UI.</div>
+          <div style="margin-top:12px">
+            <button class="btn btn-primary" style="font-size:12px;padding:8px 16px">Explore Time Machine →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     RESOURCE FINDER
+═══════════════════════════════════════════ -->
+<section id="resources" class="section">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="tag" style="margin:0 auto 16px">Resource Finder</div>
+      <h2 class="section-title">Find the best place<br>to learn any skill.</h2>
+      <p class="section-sub">Stop Googling. Search 500+ vetted resources across every major platform and get a relevance score — so the best resource always floats to the top.</p>
+    </div>
+    <div class="resource-demo reveal">
+      <div class="res-search">
+        <span class="res-search-icon">🔍</span>
+        <input class="res-search-input" type="text" value="Figma for UI/UX Beginners" readonly/>
+        <div class="res-filters">
+          <span class="res-filter">Free only</span>
+          <span class="res-filter">Beginner</span>
+          <span class="res-filter">&lt; 10 hrs</span>
+        </div>
+      </div>
+      <div class="res-results">
+        <div class="res-item">
+          <div class="res-platform" style="background:rgba(255,0,0,0.1)">▶️</div>
+          <div class="res-item-body">
+            <div class="res-item-title">Figma UI Design Tutorial — Full Course for Beginners</div>
+            <div class="res-item-meta">
+              <span>YouTube · Free</span>
+              <span>6.5 hrs</span>
+              <span>Beginner</span>
+              <span style="color:var(--teal)">4.9★ · 2.1M views</span>
+            </div>
+          </div>
+          <div class="res-item-score">98</div>
+        </div>
+        <div class="res-item">
+          <div class="res-platform" style="background:rgba(0,86,210,0.1)">📘</div>
+          <div class="res-item-body">
+            <div class="res-item-title">UI/UX Design Bootcamp with Figma (Zero to Hero)</div>
+            <div class="res-item-meta">
+              <span>Coursera · Free Audit</span>
+              <span>8 hrs</span>
+              <span>Beginner</span>
+              <span style="color:var(--teal)">4.8★ · University of Michigan</span>
+            </div>
+          </div>
+          <div class="res-item-score">94</div>
+        </div>
+        <div class="res-item">
+          <div class="res-platform" style="background:rgba(236,72,153,0.1)">🎓</div>
+          <div class="res-item-body">
+            <div class="res-item-title">Figma & UX Fundamentals — Great Learning Free Path</div>
+            <div class="res-item-meta">
+              <span>Great Learning · Free</span>
+              <span>4 hrs</span>
+              <span>Beginner</span>
+              <span style="color:var(--teal)">4.7★ · Certificate included</span>
+            </div>
+          </div>
+          <div class="res-item-score">91</div>
+        </div>
+        <div class="res-item" style="opacity:0.5">
+          <div class="res-platform" style="background:rgba(240,165,0,0.1)">🎯</div>
+          <div class="res-item-body">
+            <div class="res-item-title">Complete Figma Masterclass — Udemy</div>
+            <div class="res-item-meta">
+              <span>Udemy · ₹499</span>
+              <span>12 hrs</span>
+              <span>Beginner → Advanced</span>
+              <span style="color:var(--teal)">4.9★ · Bestseller</span>
+            </div>
+          </div>
+          <div class="res-item-score">89</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     PSYCHOMETRIC TEASER
+═══════════════════════════════════════════ -->
+<section id="psych" class="section">
+  <div class="container">
+    <div class="psych-layout">
+      <div class="reveal">
+        <div class="radar-card">
+          <div class="radar-title">Your Personality. Visualised.</div>
+          <div class="radar-sub">Sample output from the Big Five assessment</div>
+          <div class="radar-svg-wrap">
+            <svg width="220" height="220" viewBox="0 0 220 220">
+              <!-- Grid rings -->
+              <polygon points="110,20 200,65 200,155 110,200 20,155 20,65" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+              <polygon points="110,42 182,79 182,141 110,178 38,141 38,79" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+              <polygon points="110,64 164,93 164,127 110,156 56,127 56,93" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+              <polygon points="110,86 146,107 146,113 110,134 74,113 74,107" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+              <!-- Axis lines -->
+              <line x1="110" y1="20"  x2="110" y2="200" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+              <line x1="20"  y1="65"  x2="200" y2="155" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+              <line x1="20"  y1="155" x2="200" y2="65"  stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+              <!-- Data polygon (Openness:88, Conscientiousness:76, Extroversion:54, Agreeableness:70, Neuroticism:32) -->
+              <!-- Scaled points on axes -->
+              <polygon
+                points="110,28 185,73 175,145 68,158 38,96"
+                fill="rgba(240,165,0,0.12)"
+                stroke="var(--amber)"
+                stroke-width="1.8"
+                stroke-linejoin="round"
+              />
+              <!-- Data dots -->
+              <circle cx="110" cy="28"  r="4.5" fill="var(--amber)" />
+              <circle cx="185" cy="73"  r="4.5" fill="var(--amber)" />
+              <circle cx="175" cy="145" r="4.5" fill="var(--amber)" />
+              <circle cx="68"  cy="158" r="4.5" fill="var(--amber)" />
+              <circle cx="38"  cy="96"  r="4.5" fill="var(--amber)" />
+              <!-- Labels -->
+              <text x="110" y="13"  text-anchor="middle" fill="#8A95A3" font-size="11" font-family="JetBrains Mono, monospace">Openness</text>
+              <text x="204" y="70"  text-anchor="start"  fill="#8A95A3" font-size="11" font-family="JetBrains Mono, monospace">Consc.</text>
+              <text x="204" y="155" text-anchor="start"  fill="#8A95A3" font-size="11" font-family="JetBrains Mono, monospace">Extro.</text>
+              <text x="16"  y="168" text-anchor="start"  fill="#8A95A3" font-size="11" font-family="JetBrains Mono, monospace">Agree.</text>
+              <text x="16"  y="90"  text-anchor="start"  fill="#8A95A3" font-size="11" font-family="JetBrains Mono, monospace">Neuro.</text>
+              <!-- Score badges -->
+              <text x="110" y="29"  text-anchor="middle" fill="var(--amber)" font-size="9" font-family="JetBrains Mono, monospace" dy="-8">88</text>
+              <text x="185" y="73"  text-anchor="start"  fill="var(--amber)" font-size="9" font-family="JetBrains Mono, monospace" dx="6">76</text>
+              <text x="175" y="145" text-anchor="start"  fill="var(--amber)" font-size="9" font-family="JetBrains Mono, monospace" dx="6">54</text>
+              <text x="68"  y="158" text-anchor="end"    fill="var(--amber)" font-size="9" font-family="JetBrains Mono, monospace" dx="-6">70</text>
+              <text x="38"  y="96"  text-anchor="end"    fill="var(--amber)" font-size="9" font-family="JetBrains Mono, monospace" dx="-6">32</text>
+            </svg>
+          </div>
+          <div class="trait-legend">
+            <div class="trait-leg-item"><div class="trait-dot" style="background:var(--amber)"></div><span><strong>Openness</strong> — 88/100</span></div>
+            <div class="trait-leg-item"><div class="trait-dot" style="background:var(--teal)"></div><span><strong>Conscientiousness</strong> — 76</span></div>
+            <div class="trait-leg-item"><div class="trait-dot" style="background:#A78BFA"></div><span><strong>Extroversion</strong> — 54</span></div>
+            <div class="trait-leg-item"><div class="trait-dot" style="background:#60A5FA"></div><span><strong>Agreeableness</strong> — 70</span></div>
+            <div class="trait-leg-item"><div class="trait-dot" style="background:var(--coral)"></div><span><strong>Neuroticism</strong> — 32</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="preview-text reveal reveal-delay-1">
+        <div class="tag">Psychometric Assessment</div>
+        <h2 class="preview-title">Know yourself.<br>Choose <span class="accent-text">deliberately.</span></h2>
+        <p class="preview-body">
+          Unlike generic career quizzes, our Big Five assessment is rooted in decades of personality science. The result isn't a vague label — it's a precise, quantified map of your cognitive and behavioural strengths, with direct career implications baked in.
+        </p>
+        <ul class="preview-features">
+          <li><strong>50 validated questions</strong> covering all five dimensions with reverse-scored items for accuracy</li>
+          <li><strong>Radar chart output</strong> — beautiful, shareable, and linked to your career roadmap</li>
+          <li><strong>Career alignment engine</strong> — matches your profile to roles where your traits are the strongest predictors of success</li>
+          <li><strong>Similar to Mindler & iDreamCareer</strong> but fully integrated with your dashboard and roadmap</li>
+        </ul>
+        <div style="margin-top:28px">
+          <button class="btn btn-primary">Take the Free Assessment →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     TESTIMONIALS
+═══════════════════════════════════════════ -->
+<section id="testimonials" class="section" style="background:var(--bg2)">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="tag" style="margin:0 auto 16px">Early Users</div>
+      <h2 class="section-title">Built for people<br>who are serious about growth.</h2>
+    </div>
+    <div class="testi-grid">
+      <div class="testi-card reveal">
+        <div class="stars">★★★★★</div>
+        <span class="testi-quote-mark">"</span>
+        <p class="testi-text">I've tried Mindler, iDreamCareer, and a dozen Notion templates. Nothing combined the "what should I do" with the "how do I do it" and "am I on track" in one place. SOLVO is the first platform that actually connects all three.</p>
+        <div class="testi-user">
+          <div class="testi-avatar">P</div>
+          <div>
+            <div class="testi-name">Priya Mehta</div>
+            <div class="testi-role">2nd Year, B.Tech CSE · IIT Bombay</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card reveal reveal-delay-1">
+        <div class="stars">★★★★★</div>
+        <span class="testi-quote-mark">"</span>
+        <p class="testi-text">The pre-filled Kanban board alone saved me 6 hours of setup. I just opened the dashboard and it already had my roadmap broken into tasks. The Job Market Time Machine helped me pivot from Android to Flutter at exactly the right moment.</p>
+        <div class="testi-user">
+          <div class="testi-avatar">A</div>
+          <div>
+            <div class="testi-name">Arjun Sharma</div>
+            <div class="testi-role">Junior Developer · Pune</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card reveal reveal-delay-2">
+        <div class="stars">★★★★★</div>
+        <span class="testi-quote-mark">"</span>
+        <p class="testi-text">The resource finder is genuinely brilliant. I typed "learn SQL for data science" and within seconds I had a ranked list of free resources with estimated time and difficulty. I've been recommending this to every student I mentor.</p>
+        <div class="testi-user">
+          <div class="testi-avatar">S</div>
+          <div>
+            <div class="testi-name">Sneha Iyer</div>
+            <div class="testi-role">Career Counsellor · Bangalore</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     CTA
+═══════════════════════════════════════════ -->
+<section id="cta">
+  <div class="cta-glow"></div>
+  <div class="container">
+    <div class="cta-inner reveal">
+      <div class="tag" style="margin:0 auto 20px">Start Today</div>
+      <h2 class="cta-title">Your career deserves a<br><span class="accent-text">system, not just a plan.</span></h2>
+      <p class="cta-sub">Join 2,400+ students and professionals who are building their careers with data, direction, and discipline.</p>
+      <div class="cta-actions">
+        <button class="btn btn-primary btn-xl">Create Free Account — Takes 2 Minutes ↗</button>
+        <button class="btn btn-ghost btn-xl">View Live Demo</button>
+      </div>
+      <p class="cta-note">Free forever · No credit card needed · Premium unlock at just ₹99</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════════ -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo">
+          <div class="logo-mark">
+            <svg viewBox="0 0 14 14" fill="none">
+              <path d="M2 7L5.5 3L9 7L5.5 11L2 7Z" fill="#080B0F"/>
+              <path d="M7 7L10.5 3L14 7L10.5 11L7 7Z" fill="#080B0F" opacity="0.5"/>
+            </svg>
+          </div>
+          SOL<span>VO</span>
+        </div>
+        <p class="footer-brand-sub">Engineer your career deliberately. The all-in-one platform for career intelligence and personal productivity.</p>
+      </div>
+      <div>
+        <div class="footer-col-title">Platform</div>
+        <ul class="footer-links">
+          <li><a href="#">Assessment</a></li>
+          <li><a href="#">Career Roadmaps</a></li>
+          <li><a href="#">Job Market Data</a></li>
+          <li><a href="#">Resource Finder</a></li>
+          <li><a href="#">Dashboard</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Compare</div>
+        <ul class="footer-links">
+          <li><a href="#">vs Mindler</a></li>
+          <li><a href="#">vs iDreamCareer</a></li>
+          <li><a href="#">vs roadmap.sh</a></li>
+          <li><a href="#">vs Notion</a></li>
+          <li><a href="#">vs LinkedIn Learning</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Company</div>
+        <ul class="footer-links">
+          <li><a href="#">About</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">Changelog</a></li>
+          <li><a href="#">Contact</a></li>
+          <li><a href="#">Careers</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 SOLVO. Built in India 🇮🇳</span>
+      <div class="footer-legal">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Refund Policy</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════════ -->
+<script>
+  // ── Custom cursor ──────────────────────────────────────────
+  const dot  = document.querySelector('.cursor-dot');
+  const ring = document.querySelector('.cursor-ring');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  window.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    dot.style.left  = mx + 'px';
+    dot.style.top   = my + 'px';
+  });
+
+  (function animRing() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px';
+    ring.style.top  = ry + 'px';
+    requestAnimationFrame(animRing);
+  })();
+
+  document.querySelectorAll('button, a').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      ring.style.width  = '50px';
+      ring.style.height = '50px';
+      ring.style.borderColor = 'var(--amber)';
+    });
+    el.addEventListener('mouseleave', () => {
+      ring.style.width  = '36px';
+      ring.style.height = '36px';
+      ring.style.borderColor = 'var(--amber-dim)';
+    });
+  });
+
+  // ── Nav scroll ────────────────────────────────────────────
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 40);
+  });
+
+  // ── Scroll reveal ─────────────────────────────────────────
+  const revealEls = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  revealEls.forEach(el => observer.observe(el));
+
+  // ── Counter animation for stats ───────────────────────────
+  function animateCounter(el, target, suffix, duration) {
+    let start = 0;
+    const step = target / (duration / 16);
+    const timer = setInterval(() => {
+      start += step;
+      if (start >= target) { start = target; clearInterval(timer); }
+      const display = Number.isInteger(target) ? Math.floor(start) : start.toFixed(0);
+      el.innerHTML = display + '<span class="unit">' + suffix + '</span>';
+    }, 16);
+  }
+
+  // Animate stat numbers when they enter view
+  const statNums = document.querySelectorAll('.stat-num');
+  const statData = [
+    { target: 8,   suffix: '+' },
+    { target: 500, suffix: '+' },
+    { target: 120, suffix: '+' },
+    { target: 99,  suffix: '' },
+  ];
+  let statsAnimated = false;
+  const statsObserver = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting && !statsAnimated) {
+      statsAnimated = true;
+      statNums.forEach((el, i) => {
+        const d = statData[i];
+        const prefix = i === 3 ? '₹' : '';
+        if (i === 3) {
+          el.innerHTML = '₹99';
+        } else {
+          animateCounter(el, d.target, d.suffix, 1200);
+        }
+      });
+    }
+  }, { threshold: 0.5 });
+  if (statNums[0]) statsObserver.observe(statNums[0].closest('section'));
+</script>
+
+</body>
+</html>
